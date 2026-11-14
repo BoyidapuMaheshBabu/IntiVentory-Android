@@ -1,214 +1,165 @@
-# Product Requirements Document
+# IntiVentory Product Requirements Document (PRD)
 
-## 1. Purpose and user
+**Document Status:** Baseline PRD for the accepted Phase 01–07 MVP.  
+**Product Identity:** IntiVentory (Telugu: *ఇంటి వెంటరీ*)  
+**Tagline:** *మన ఇంటి సరుకులు, మన ఇంటి లెక్కలు.* (Our household supplies, our household accounts.)  
+**Technical Identifiers:** Application ID: `com.boyidapu.homestock` | Repository: `IntiVentory-Android`
 
-IntiVentory is an offline-first native Android app for tracking household products, purchases, usage, remaining quantities, and household purchase spending. The repository is named `IntiVentory-Android`; the Android application ID remains a separate technical identifier.
+---
 
-## 2. First launch
+## 1. Purpose & User Persona
 
-- Display the approved app name **IntiVentory** and use the logo assets documented in [Branding](BRANDING.md).
-- Brand caption: **మన ఇంటి సరుకులు, మన ఇంటి లెక్కలు.**
-- Ask for the user's name on first launch.
-- Trim whitespace and reject a blank name.
-- Limit the display name to 10 characters in Welcome and Settings.
-- Save the name locally and reuse it on later launches.
-- Show a friendly time-based greeting using device-local time.
-- No account or internet connection is required.
-- Start tracking purchases from app use; no opening-stock entry is required.
+**IntiVentory** is a local-first native Android app designed for tracking household products, purchases, consumption, remaining quantities, and purchase expenditure. Built specifically for offline household use, it replaces physical registers or complex spreadsheets with a simple, reliable, and privacy-preserving tool.
 
-## 3. Home screen
+---
 
-The screen order is fixed:
-1. Top row: greeting top-left; Settings gear top-right.
-2. Compact clickable This month spending card showing actual recorded purchase spending from the first day of the current local calendar month through today, including the date range.
-3. A short heading and exactly three large rectangular clickable hero cards: Food & Kitchen, Home Care & Cleaning, Personal Care & Cosmetics.
+## 2. Onboarding & First Launch
 
-The card opens Insights with This month selected. If no purchases exist this month, show ₹0 and a no-purchases message. No separate Snacks or Drinks category and no top-level category creation. Keep detailed filters off the Home screen.
+* **Visual Identity:** Display approved app name **IntiVentory**, logo artwork ([BRANDING.md](BRANDING.md)), and Telugu tagline (*మన ఇంటి సరుకులు, మన ఇంటి లెక్కలు.*).
+* **Display Name Input:** Prompt for user name on first launch.
+  * Trim leading/trailing whitespace.
+  * Reject blank or whitespace-only inputs.
+  * Limit display name to a maximum of **10 characters** in Welcome, Home, and Settings.
+  * Persist locally in Preferences DataStore; skip onboarding on subsequent launches.
+* **Greeting:** Show a friendly time-based greeting (*Good morning*, *Good afternoon*, *Good evening*) using device-local time.
+* **Privacy & Access:** No user accounts, remote sign-ins, or network connections are required.
 
-## 4. Fixed categories and starter products
+---
 
-- **Food & Kitchen:** Rice, Dal, Flour, Oil, Spices.
-- **Home Care & Cleaning:** Toilet Cleaner, Floor Cleaner, Dishwashing Liquid, Detergent, Disinfectant.
-- **Personal Care & Cosmetics:** Soap, Shampoo, Toothpaste, Hair Oil, Cream.
+## 3. Home Screen
 
-These are preset products inside exactly three top-level categories. Users may add custom products inside any of the three. No brand field.
+Fixed screen layout order:
+1. **Top Row:** Time-based greeting on top-left; Settings gear icon on top-right.
+2. **This Month Spending Card:** Clickable card displaying total purchase spending (`₹`) recorded from the first calendar day of the current month through today, including the date range. Tapping opens Spending Insights with *This month* selected. If no purchases exist, show `₹0` and a clear no-purchases message.
+3. **Category Hero Cards:** Exactly three large rectangular clickable cards:
+   * **Food & Kitchen**
+   * **Home Care & Cleaning**
+   * **Personal Care & Cosmetics**
 
-Seed the preset product list once and begin all products with zero recorded stock. A product deliberately deleted before it has history must not be silently recreated on every launch.
+> [!NOTE]  
+> No top-level category creation and no separate *Snacks* or *Drinks* categories are allowed. Detailed date filters remain exclusive to the Insights screen.
 
-## 5. Product list and product creation
+---
 
-Product rows show the name and current quantity on the left, plus action and three-dot menu on the right. Tapping the main row opens product history.
+## 4. Fixed Categories & Preset Catalog
 
-Creating a product is separate from purchasing it. Product creation asks for the name and one measurement type; the fixed category comes from the current category screen. It does not ask for a preferred unit, price, or starting quantity. New products begin at zero stock. Product names are limited to 40 characters.
+Preset starter products seeded once upon initial database creation:
 
-Every product has exactly one measurement type:
-- **Mass:** compatible quantity-entry units are kg and g.
-- **Liquid:** compatible quantity-entry units are L and ml.
-- **Units:** compatible quantity-entry quantity is a whole-number count of pieces/items.
+* 🌾 **Food & Kitchen:** Rice, Dal, Flour, Oil, Spices.
+* 🧹 **Home Care & Cleaning:** Toilet Cleaner, Floor Cleaner, Dishwashing Liquid, Detergent, Disinfectant.
+* 🧴 **Personal Care & Cosmetics:** Soap, Shampoo, Toothpaste, Hair Oil, Cream.
 
-The user selects the quantity unit when recording each Add or Use transaction. Do not store a preferred/default unit on the product and do not treat compatible units as separate product types. Store Mass in integer grams, Liquid in integer millilitres, and Units as whole integer counts. Convert between compatible units exactly and display stock in a clear, readable form without requiring a product-level preferred-unit setting.
+Users may add custom products within any of the three fixed categories. Starter products begin at zero stock. Deliberately deleted preset products must not be recreated on subsequent app launches.
 
-For a product with no transaction history, allow the measurement type to be changed freely among Mass, Liquid, and Units, even after earlier type changes have been saved. Once any transaction exists, lock the measurement type permanently, even if current stock later returns to zero. The editor must continue to show the saved type as selected and must not remove the other type options from a product with no transaction history.
+---
 
-## 6. Product row actions and safety
+## 5. Product Catalog & Creation Rules
 
-### Plus action
-Opens Add and Use choices:
-- **Add:** purchase/stock-in.
-- **Use:** consumption/stock-out.
+* **Product Row Display:** Shows name and current calculated stock on the left, plus (`+`) action button and three-dot menu on the right. Tapping the main row opens Product Transaction History.
+* **Product Creation Form:** Asks for product name (maximum **40 characters**) and measurement dimension only.
+  * Fixed category is pre-selected by current screen context.
+  * Does not ask for starting quantity, unit price, or preferred unit.
+  * New products begin with zero recorded stock.
+* **Measurement Dimensions:**
+  * **Mass:** Compatible entry units are `kg` and `g` (stored in integer grams).
+  * **Liquid:** Compatible entry units are `L` and `ml` (stored in integer millilitres).
+  * **Units:** Compatible entry units are whole pieces/items (stored in integer counts).
+* **Permanent Measurement Lock:**
+  * Measurement dimension can be modified freely while a product has **zero** transaction history.
+  * Once any transaction is recorded, `hasEverHadTransactions` locks the measurement dimension permanently, even if current stock later returns to zero.
 
-### Three-dot menu
-- **Edit:** product name (maximum 40 characters) and measurement type, subject to the transaction-history rule above. Do not offer a preferred-unit setting.
-- **Delete permanently:** allow for a product with or without transaction history, after an explicit confirmation that the product and all associated history will be permanently deleted. The confirmation must clearly warn that this cannot be undone. Delete the product and its transactions atomically; a failure must not leave partial deletion. Recalculate spending totals without the deleted Add transactions. Ensure a deleted preset is not silently recreated by seeding.
-- **Archive / Hide:** allow when the user no longer wants an item, regardless of current stock or whether transaction history exists. Archive preserves the product, current derived stock, all transactions, and spending totals. It hides the product from active category lists and prevents new transactions while archived.
-- **Restore:** archived products appear under Settings > Archived Products. Restoring makes the original product active again with its previous stock and complete history. It must not create duplicates or reseed the product.
-- Archive is reversible; permanent deletion is not. Never use Archive as a reason to discard history, and never delete history as part of an Archive operation.
+---
 
-### Edit form behavior
+## 6. Product Actions & Safety Safeguards
 
-- Disable **Save changes** when the effective edited values are unchanged from the saved product or invalid.
-- Enable Save only when a valid change exists. If the user changes a value and then restores its original value, disable Save again.
-- An unchanged save attempt must not write to the repository or close/navigate away from the editor.
-- On successful save, persist once and navigate back once. On failure, keep the editor open and show an error.
-- Reopening the same product's editor after save or cancel must reliably display the current saved value; it must not flash open and close.
-- Use clear enabled/disabled button states. UI styling is left to the implementation agent, following IntiVentory branding and Material 3.
+### Plus (`+`) Action
+Opens a choice between **Add** and **Use**:
+* **Add:** Purchase / Stock-In transaction.
+* **Use:** Consumption / Stock-Out transaction.
 
-## 7. Add transaction
+### Three-Dot Menu
+* **Edit:** Product name (max 40 characters) and measurement dimension (subject to the `hasEverHadTransactions` lock rule).
+* **Delete Permanently:** Prompts for explicit destructive confirmation warning that all associated history will be permanently erased. Executes an atomic Room transaction deleting the product and all transaction entities. Recalculates all spending totals.
+* **Archive / Hide:** Hides the product from active category lists while fully preserving current derived stock, all transaction records, and historical spending totals.
+* **Restore:** Accessible via **Settings > Archived Products**. Restores the product to its active category with stock and history intact.
 
-From a product's plus action, select Add. The form shows the product, quantity, compatible unit, actual total amount paid in INR, and purchase date.
+---
 
-- Quantity must be positive and compatible with the product dimension.
-- Mass uses kg/g; Liquid uses L/ml; Units use whole pieces/items.
-- kg/L input may use up to three decimal places; g/ml and count use whole numbers.
-- Amount paid is required, non-negative, and at most two decimal places. ₹0.00 is allowed for a free purchase.
-- Date defaults to today; past dates can be selected; future dates are disallowed.
-- Save one dated Add transaction, increase stock, and update all relevant spending totals immediately.
-- The transaction must be counted exactly once.
+## 7. Add (Purchase) Transactions
 
-## 8. Use transaction
+* **Form Fields:** Product name, positive quantity, compatible unit (`kg`/`g`, `L`/`ml`, or count), total amount paid in INR (`₹`), and purchase date.
+* **Quantity Rules:** Positive numbers only. Decimal input up to 3 decimal places for `kg`/`L`; whole integers for `g`/`ml` and `Units`.
+* **Amount Paid:** Required, non-negative, up to 2 decimal places. `₹0.00` is permitted for free purchases.
+* **Date Rules:** Defaults to today's local date. Past dates permitted; future dates rejected.
+* **Effect:** Saves one `ADD` transaction entity, increases calculated stock, and updates all affected spending totals immediately.
 
-From the plus action, select Use. Show current stock before the quantity input.
+---
 
-- Quantity must be positive and in a compatible unit.
-- Date defaults to today; past dates can be selected; future dates are disallowed.
-- If current stock is zero, block Use with a clear message.
-- If requested quantity exceeds current stock, reject it, show available stock, and create no transaction.
-- On success, save one dated Use transaction and reduce stock immediately.
-- Use never changes historic purchase spending.
-- Use covers expired or thrown-away quantities too; no separate disposal workflow is needed.
-- Check stock and save Use atomically; disable Save while a write is in progress.
+## 8. Use (Consumption) Transactions
 
-## 9. Stock calculation
+* **Form Fields:** Current stock preview, positive quantity to consume, compatible unit, and usage date.
+* **Date Rules:** Defaults to today's local date. Past dates permitted; future dates rejected.
+* **Atomic Stock Validation:**
+  * If stock is zero, block Use with an explanatory error.
+  * If requested quantity exceeds current stock, reject save, display available stock, and record no transaction.
+* **Effect:** Saves one `USE` transaction entity and reduces stock immediately. *Use transactions never affect spending totals.*
 
-Stored base units are grams for Mass, millilitres for Liquid, and pieces for Units.
+---
 
-**Remaining stock = total Add quantities − total Use quantities**, after converting units to the base unit.
+## 9. Derived Stock & Money Math
 
-Examples:
-- 10 kg rice purchased; 1 kg used; 9 kg remains.
-- 2 kg rice purchased; 500 g used; 1.5 kg remains.
-- 1 L cleaner purchased; 200 ml used; 800 ml remains.
-- 5 soap bars purchased; 1 used; 4 remain.
+Stored base units: grams (`g`) for Mass, millilitres (`ml`) for Liquid, and pieces (`count`) for Units.
 
-Never mix Mass, Liquid, or Units. Never allow negative stock.
+$$\text{Current Stock} = \sum \text{Add Quantities (in base units)} - \sum \text{Use Quantities (in base units)}$$
 
-## 10. Product transaction history and corrections
+* **Currency Storage:** Total paid amounts are parsed to integer paise (`Long`) to eliminate floating-point drift.
+* **Dimension Safety:** Mass, Liquid, and Units must never be mixed.
 
-Tapping a product row opens a vertically scrollable transaction history for that product:
-- Group entries by the local calendar date using Today, Yesterday, or a readable date.
-- Show newer dates first; order entries on the same date by newest recorded first.
-- Show Add/Purchase or Use, quantity, compatible unit, and the stock effect.
-- Add/Purchase entries show the actual amount paid; Use entries do not show a money amount.
-- Show product-specific total recorded purchase spending.
-- Do not display time-of-day in the history list in the first MVP.
-- Keep each history row visually simple. Tapping a row opens its transaction details and correction actions rather than displaying permanent Edit/Delete buttons on every row.
+---
 
-### Edit any transaction
+## 10. Product History & Correction Safeguards
 
-Every saved transaction remains editable regardless of its age, including transactions that are more than 30 minutes old.
+### Auditable History List
+* Vertically scrollable, date-grouped (`Today`, `Yesterday`, or formatted date).
+* Ordered by transaction date descending; same-date entries ordered newest recorded first.
+* `ADD` entries show quantity, unit, amount paid (`₹`), and stock impact.
+* `USE` entries show quantity, unit, and stock impact (no money field).
+* Shows product-specific total purchase spending.
 
-- For an **ADD** transaction, allow editing quantity, compatible unit, actual total amount paid, and transaction date.
-- For a **USE** transaction, allow editing quantity, compatible unit, and transaction date. Do not show a money field for Use.
-- The transaction's product association and type (ADD or USE) remain fixed in this phase; editing does not move a record to another product or convert a purchase into consumption.
-- Do not introduce a free-text note/description field as part of this scope.
-- Validate edited quantities and amounts using the same rules as creating transactions. Keep the original product's measurement type and compatible-unit restrictions.
-- Preserve the transaction ID and original `createdAtEpochMs` when updating a transaction. Editing must never reset or extend its Delete eligibility window.
-- Apply an edit atomically. Recalculate derived stock and spending from saved transactions; do not maintain independently edited totals.
-- Reject an edit if it would make the product's derived current stock negative. Show an understandable error and keep the previous transaction unchanged.
-- Recalculate date-filtered purchase totals when an ADD amount or transaction date changes. USE edits affect stock but never affect spending.
-- Editing an archived product's existing transaction does not unarchive the product.
+### Editing Transactions
+* Any saved transaction can be edited regardless of age.
+* `ADD` transactions allow editing quantity, unit, amount paid, and transaction date.
+* `USE` transactions allow editing quantity, unit, and transaction date.
+* Edits preserve original `transactionId` and immutable `createdAtEpochMs`.
+* Edits that would cause negative derived stock are rejected atomically.
 
-### Delete a transaction within 30 minutes
+### 30-Minute Time-Limited Deletion
+* Individual transaction deletion is available **only within 30 minutes** of original creation (`createdAtEpochMs`).
+* At $\ge 30$ minutes, deletion is blocked in both UI and repository/DAO layers.
+* Editing a transaction does not reset or extend the 30-minute countdown.
 
-- Permanently deleting an individual transaction is available only during the first 30 minutes after that transaction was recorded.
-- Calculate the window from the immutable `createdAtEpochMs` recorded when the save succeeded—not from the editable purchase/usage date and not from the time the editor was last opened.
-- At or after the exact 30-minute boundary, Delete is unavailable. The UI should hide or disable the action, and the repository/domain layer must enforce the same deadline so stale UI cannot bypass it.
-- Confirm deletion explicitly while the action is available. Once confirmed, delete only that transaction atomically.
-- Reject deletion if removing the transaction would make derived stock negative. Explain why and preserve the existing record.
-- After a successful deletion, stock and all relevant spending totals must recalculate immediately. Deletion must not recreate preset products or leave partial writes.
-- Editing a transaction does not restart the 30-minute countdown.
-- Transactions that existed before the recorded-time field was introduced must be treated as outside the Delete window during migration, because their true recording time cannot be reconstructed safely.
+---
 
-### Preserve the permanent measurement-type lock
+## 11. Spending Dashboard & Insights
 
-A product's measurement type locks permanently once any transaction has ever been successfully recorded. Deleting that transaction within the 30-minute window must not unlock the product. Store a durable product-level flag such as `hasEverHadTransactions`, set atomically when the first transaction is recorded and never reset by transaction editing or deletion.
+* **Five Period Filters:** *Last 7 days*, *This month*, *Last 3 months*, *Custom date range*, and *All time*.
+* **Summary Card:** Total purchase expenditure (`₹`), total purchase record count, and average cost per purchase.
+* **Spending Trend Chart:** Time-bucketed bar chart (daily, weekly, or monthly depending on filter).
+* **Category Share:** Proportional spending breakdown across the three fixed categories.
+* **Top Spending Products:** Ranks top 5 spending items in the selected timeframe.
 
-Transaction correction does not add transaction-row editing to the product row itself; use the transaction details flow.
+---
 
-## 11. Dashboard and spending Insights
+## 12. Settings & About Screen
 
-The key money metric is actual recorded purchase spending—not an estimated market value of remaining stock.
+* **Settings Screen:** Update user display name, manage archived products, and access the About screen.
+* **Archived Products Screen:** List all archived products and provide a one-tap **Restore** action.
+* **About Screen (`ui/about`):** Displays application branding, Telugu tagline, version details, and open-source project info.
 
-If recorded purchase spending is ₹5,000 and a new ₹5 shampoo purchase is saved, the all-time total immediately becomes ₹5,005. Use changes stock only. Creating or editing a product alone does not change spending.
+---
 
-Filters use device-local calendar dates and inclusive boundaries:
-- **Last 7 days:** today and previous six calendar dates.
-- **This month:** first day of current calendar month through today.
-- **Last 3 months:** first day of the calendar month two months before the current month through today.
-- **Custom date range:** both selected start and end dates included; start must be on or before end; future dates not allowed.
-- **All time / Since app start:** all saved Add transactions.
+## 13. Privacy & Deferred Features
 
-Example for October 23, 2026: Last 7 days is October 17–23; This month is October 1–23; Last 3 months is August 1–October 23. Last 3 months is a calendar period, not a rolling same-date range.
-
-For each range, sum actual paid amounts from Add transactions in that range. Include archived products. Use never changes spending. Display the actual selected range. Empty range returns ₹0 and a clear empty state. Home's This month value must match Insights' This month value.
-
-### Phase 06 Insights screen content
-
-Insights is one vertically scrollable screen with these sections in this exact order:
-1. Existing app bar with Back and **Spending Insights**.
-2. Five single-select period filters: Last 7 days, This month, Last 3 months, Custom, All time. Default to This month. All sections use the same selected period.
-3. **Total purchase spending** summary card: prominent INR total, selected date range, purchase-record count, and average amount per purchase. Count ADD transaction records (including free purchases). Average is the total divided by count, rounded to the nearest paise; show an em dash when count is zero.
-4. **Spending trend** bar chart grouped by the selected period's date buckets.
-5. **Spending by category** with each of the three fixed categories, purchase amount, percent share, and proportional horizontal bar.
-6. **Top spending products** list containing up to five products ranked by total purchase spending in the selected period. Show product name, category, and amount.
-
-Full interaction and design details are defined in [Phase 06 Insights screen design](phases/phase-06-insights-design.md).
-
-### Spending trend aggregation
-
-- Last 7 days: one bucket per local calendar day.
-- This month: one bucket per day from the first of the month through today.
-- Last 3 months: one bucket per calendar month.
-- Custom ranges of 31 calendar days or fewer: daily; 32–180 days: weekly (Monday–Sunday, clipped to the selected boundaries); longer ranges: monthly.
-- All time: monthly buckets from the month of the first ADD transaction through the current local month.
-- Use inclusive local-calendar boundaries and avoid fixed-millisecond day arithmetic. Label buckets and provide a readable way to inspect the exact bucket amount.
-
-### Breakdown and empty-state rules
-
-- Category totals group ADD amounts by the product's fixed category. All three fixed categories must be represented; percentages are relative to overall spending for the selected range.
-- Top spending products rank by ADD amount, descending; include archived products and show an unobtrusive Archived label. Exclude products with zero total spend from the ranking. Equal totals must have deterministic ordering.
-- Purchases of archived products remain included in summary, trend, category, product ranking, count, and average.
-- Use and stock changes never affect spending analytics. Editing an ADD amount/date updates every affected section. Permanent product deletion removes its transactions from all analytics.
-- When there are no purchase records, show ₹0, zero purchases, an em dash average, and helpful empty states. When records exist but all purchases were free, count them but do not display misleading positive-spending bars or percentages.
-- Do not add budgets, savings targets, forecasts, overspending claims, AI insights, or network-dependent features in Phase 06.
-
-## 12. Offline storage, privacy and deferred features
-
-Products, name, transactions, stock and spending are local. Room is the source of truth for product/transaction data; totals are derived from transactions. No account, cloud sync, internet permission, analytics or ad SDK is needed. JSON backup/restore remains deferred beyond the accepted core MVP and requires a separately approved follow-up phase.
-
-## 13. Related specifications
-
-- [Architecture](ARCHITECTURE.md)
-- [Acceptance tests](ACCEPTANCE-TESTS.md)
-- [Roadmap](ROADMAP.md)
-
+* **100% Local Storage:** Room SQLite database + Preferences DataStore.
+* **Zero Network Code:** `android.permission.INTERNET` omitted. No cloud sync, ads, or analytics SDKs.
+* **Deferred Features:** JSON backup/restore is explicitly deferred beyond the core MVP.

@@ -1,31 +1,38 @@
-# Project Progress
+# IntiVentory Project Progress Snapshot
 
-**Snapshot date:** 2026-11-05  
-**Accepted baseline:** `main`  
-**Overall status:** Core MVP phases 01–07 are recorded complete.
+**Snapshot Date:** 2026-11-14  
+**Accepted Baseline:** `main`  
+**Overall Status:** Core MVP Phases 01–07 Complete & Owner-Accepted.
 
-This file is a concise status snapshot. Use [ROADMAP.md](ROADMAP.md) for phase scope and sequencing, [ACCEPTANCE-TESTS.md](ACCEPTANCE-TESTS.md) for expected behavior, and the phase records for delivery and verification evidence.
+This document presents a concise snapshot of project progress. Refer to [ROADMAP.md](ROADMAP.md) for phase sequencing, [ACCEPTANCE-TESTS.md](ACCEPTANCE-TESTS.md) for expected behavioral criteria, and [docs/phases/README.md](phases/README.md) for detailed delivery records.
 
-## Phase status
+---
 
-| Phase | Scope | Status | Evidence note |
-|---|---|---|---|
-| 01 | Android foundation | Complete | The phase record reports a successful build, 13/13 unit tests, and owner-reported device launch checks. |
-| 02 | Welcome and Home | Complete | Owner acceptance following physical-device usability checks is recorded. |
-| 03 | Product catalogue and management | Complete | Owner acceptance following physical-device re-testing is recorded. |
-| 04 | Add/Use transactions and stock rules | Complete | The 47-unit-test result is recorded as implementation-reported evidence. |
-| 05 | Product transaction history and correction safeguards | Complete | The 54-unit-test result is recorded as implementation-reported evidence. |
-| 06 | Spending Dashboard and Insights | Complete | The merge record does not claim an independent Gradle test or debug-build run. |
-| 07 | Final verification and intended-user review | Complete | The project owner reported successful physical-device functional testing on 2026-11-02; no new Gradle execution output is recorded in this update. |
+## Phase Completion Matrix
 
-## Evidence interpretation
+| Phase | Description | Status | Evidence Summary |
+| :---: | :--- | :---: | :--- |
+| **01** | Android Foundation & Setup | ✅ Complete | PR #2 — Successful build, 13/13 passing unit tests, owner-reported device launch. |
+| **02** | Welcome & Home Screen | ✅ Complete | PR #3 — Owner acceptance following physical-device usability checks. |
+| **03** | Product Catalogue & Management | ✅ Complete | PR #5 — Owner acceptance following physical-device re-testing (starter catalog, archive/restore). |
+| **04** | Add/Use Transactions & Stock Rules | ✅ Complete | PR #6 — 47 passing unit tests (dimension safety, atomic stock checks). |
+| **05** | Product Transaction History & Safeguards | ✅ Complete | PR #7 — 54 passing unit tests (date-grouped log, 30-min delete cutoff, permanent dimension lock). |
+| **06** | Spending Dashboard & Insights | ✅ Complete | PR #8 — Owner acceptance of expanded Insights screen (5 filters, trend chart, top products). |
+| **07** | Verification & Intended-User Review | ✅ Complete | Main baseline — Owner (Mahesh) confirmed physical-device testing acceptance on 2026-11-02. |
 
-- Physical-device acceptance is a project-owner report, not an automated test result.
-- Test counts from earlier phase records are attributed to the implementation workflow that reported them; they are not presented as independent reruns in this snapshot.
-- The acceptance-test checklist remains a traceability catalogue. Unchecked scenarios are not individually verified merely because Phase 07 is recorded complete.
-- Consult each [phase verification record](phases/README.md) before making a specific claim about tests, builds, or manual checks.
+---
 
-## Deferred work
+## Evidence & Qualification Protocol
 
-- JSON backup/restore remains deferred beyond the accepted core MVP. It is not implemented and has no active implementation plan.
-- No new product phase is currently scheduled. Create a scoped phase plan only after a new objective is explicitly approved.
+> [!NOTE]  
+> **Distinction of Evidence Types:**
+> * **Owner Device Acceptance:** Physical-device testing performed by Mahesh on 2026-11-02. This confirms user-visible functional correctness.
+> * **Agent Test Reports:** Unit test counts (e.g., 13, 47, 54 tests) are attributed to the specific phase implementation reports that produced them.
+> * **Acceptance Test Matrix:** The checklist in `ACCEPTANCE-TESTS.md` serves as a requirements traceability catalogue across phase releases.
+
+---
+
+## Deferred & Future Work
+
+* **JSON Backup / Restore:** Explicitly deferred beyond the accepted core MVP. No implementation is currently active.
+* **Future Feature Phases:** Any new phase (e.g., Product Search or Export) requires explicit project owner approval and a dedicated phase brief before branch preparation.

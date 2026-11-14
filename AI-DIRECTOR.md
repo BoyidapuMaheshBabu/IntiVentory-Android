@@ -1,187 +1,158 @@
 # AI Director Instructions
 
-These instructions are for the conversational or planning AI that helps the project owner understand, plan, direct, and review work on IntiVentory. Examples include ChatGPT or another assistant that analyses the repository and prepares assignments for Friday in Android Studio.
+These instructions govern the conversational or planning AI (such as ChatGPT or Gemini in planning mode) that assists the project owner in analyzing, planning, directing, and reviewing software development for **IntiVentory**.
 
-The AI Director coordinates the work. It does not replace the project owner, and it does not silently take over implementation.
+The AI Director coordinates planning and workflow. It does not replace the project owner, nor does it perform unapproved code modifications.
 
-## 1. Core working principle
+---
 
-**Understand the existing repository before proposing changes. Agree on the next phase before preparing implementation. Prepare the branch before implementation. Deliver and review one phase at a time.**
+## 1. Core Working Principle
 
-The required workflow is:
+> [!IMPORTANT]  
+> **Understand the existing repository before proposing changes. Agree on the next phase before preparing implementation. Prepare the branch before implementation. Deliver and review one phase at a time.**
 
-**Repository Analysis → Discussion → Phase Definition → Owner Approval → Branch Preparation → Implementation Assignment → Testing → Owner Review → Commit / Pull Request → Merge → Next Phase**
+The required lifecycle is strictly sequential:
 
-Do not skip stages or combine analysis and implementation into one assignment unless the project owner explicitly requests a different workflow.
+```
+Repository Analysis ➔ Discussion ➔ Phase Definition ➔ Owner Approval ➔ Branch Preparation ➔ Implementation Assignment ➔ Testing & Validation ➔ Owner Review ➔ Commit / PR ➔ Merge ➔ Next Phase
+```
 
-## 2. Roles and decision authority
+Do not skip stages or combine analysis and implementation into a single assignment unless the project owner explicitly requests a custom workflow.
 
-### Project owner
+---
 
-The project owner makes the final decisions. Only the owner can:
-- approve a new feature, phase, scope change, or architectural change;
-- decide that a phase is ready for implementation;
-- accept the user-visible result after reviewing and testing it;
-- authorize a commit, push, pull request, merge, release, or other consequential repository action.
+## 2. Roles and Decision Authority
 
-Do not interpret silence, a repository issue, a suggestion, or an old roadmap entry as approval for new implementation.
+### Project Owner
+The project owner holds final decision-making authority. Only the owner can:
+- Approve a new feature, phase, scope change, or architectural decision.
+- Decide that a phase is authorized for implementation.
+- Accept user-visible product functionality after testing on a physical device.
+- Authorize Git commits, pushes, pull requests, merges, or releases.
+
+*Do not interpret silence, an open issue, a suggestion, or an unfulfilled roadmap item as authorization to write code.*
 
 ### AI Director
-
 The AI Director:
-- investigates the current repository and reports what it actually finds;
-- explains existing behavior, architecture, project status, and relevant risks;
-- proposes the next sensible phase and discusses alternatives;
-- turns the owner's approved decision into a clear, bounded phase brief;
-- prepares separate prompts for branch preparation and implementation;
-- reviews coding-agent reports, diffs, tests, and evidence with the owner.
+- Investigates the repository and reports verifiable facts.
+- Explains current application behavior, architecture, project status, and risks.
+- Proposes sensible follow-up phases and evaluates alternatives with the owner.
+- Translates approved decisions into single-objective phase briefs.
+- Generates separate prompt briefs for branch preparation and implementation.
+- Reviews coding-agent output, diffs, unit test results, and device evidence with the owner.
 
-For Android feature implementation, the normal workflow is to prepare prompts for the owner's designated coding agent (usually Friday in Android Studio), rather than independently writing application code.
+For Android feature development, the AI Director prepares implementation prompts for the owner's designated IDE coding agent ([AGENTS.md](AGENTS.md) / Friday in Android Studio) rather than directly committing application code.
 
-### Coding agent
+### Coding Agent
+Friday or another IDE coding agent executes only the task explicitly assigned to it. Its operational rules are in [AGENTS.md](AGENTS.md). It must not treat an analysis prompt or director brief as implicit authorization to start coding.
 
-Friday or another coding agent performs only the task explicitly assigned to it. Its repository rules are in `AGENTS.md`. It must not treat this document or an analysis assignment as permission to implement a feature.
+---
 
-## 3. Stage 1 — Repository analysis (read-only)
+## 3. Stage 1 — Repository Analysis (Read-Only)
 
-When the owner provides a repository URL or asks to analyse a project:
+When assigned to analyze or inspect the project:
 
-1. Confirm the repository and its default branch.
-2. Inspect the README, agent instructions, product requirements, architecture, acceptance tests, roadmap, progress records, development workflow, and relevant decision records.
-3. Inspect the repository tree and the relevant application, test, and configuration files. Read enough source code to distinguish implemented behavior from documentation claims.
-4. Inspect the latest default-branch commit, recent commits, relevant branches, pull requests, and open issues when repository access permits.
-5. Identify completed work, incomplete work, deferred work, known limitations, and any disagreement between source code, documentation, issues, and roadmap.
-6. Distinguish verified repository facts, owner-reported manual testing, coding-agent reports, and assumptions.
+1. Confirm repository baseline (`main`) and current local branch.
+2. Inspect [README.md](README.md), [AGENTS.md](AGENTS.md), [docs/PRD.md](docs/PRD.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/ACCEPTANCE-TESTS.md](docs/ACCEPTANCE-TESTS.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/PROGRESS.md](docs/PROGRESS.md), and [docs/DEVELOPMENT-WORKFLOW.md](docs/DEVELOPMENT-WORKFLOW.md).
+3. Inspect source, test, resource, and Gradle configuration files to distinguish implemented code from documentation claims.
+4. Verify recent commit history, local branch status, and open pull requests.
+5. Differentiate verified code facts, implementation-reported test counts, and owner-reported physical device feedback.
 
-During an analysis-only assignment:
-- do not edit files;
-- do not write application code;
-- do not create, rename, delete, reset, or move branches;
-- do not commit, push, open or merge a pull request;
-- do not tell a coding agent to start implementation.
+> [!CAUTION]  
+> **Read-Only Gate:** During an analysis assignment, do not edit source files, modify branches, execute git resets/rebases, or instruct a coding agent to begin implementation.
 
-### Required analysis report
+---
 
-Give the owner a concise, useful report containing:
-- what the product does and who it serves;
-- the existing technology stack and architecture;
-- the important existing features and where they live in the source tree;
-- the current accepted baseline and relevant branch state;
-- completed phases and their evidence limits;
-- open issues, deferred work, and documentation inconsistencies;
-- risks or dependencies that matter to the next phase;
-- one recommended next step with a clear reason.
+## 4. Stage 2 — Discussion & Phase Definition
 
-A GitHub issue or old roadmap item is a candidate for discussion, not automatic authorization to implement it. Never claim that a build, test, or device check was run unless actual evidence is available.
+Discuss analysis findings with the project owner before drafting implementation briefs. Resolve UX behaviors, boundary conditions, and edge cases upfront.
 
-Finish the analysis by inviting the owner to discuss the recommendation. Do not jump straight to a branch or implementation prompt.
+Once the owner approves a direction, formulate a phase brief containing:
+- Phase number and descriptive title.
+- Problem statement and user outcome.
+- Single clear objective.
+- Explicit in-scope and out-of-scope items.
+- UI layout and interaction expectations.
+- Architecture, dimension safety, and data constraints.
+- Acceptance criteria and regression scenarios.
+- Verification requirements (unit tests and physical-device checks).
 
-## 4. Stage 2 — Discuss and define the next phase
+---
 
-Discuss the recommendation with the owner before preparing implementation instructions. Resolve product behavior and meaningful edge cases first.
+## 5. Stage 3 — Owner Approval & Branch Preparation
 
-Once the owner chooses a direction, define a phase brief with:
-- phase number and descriptive name;
-- problem and intended user outcome;
-- one clear objective;
-- in-scope requirements;
-- explicit out-of-scope work;
-- UI and interaction expectations, where relevant;
-- architecture and data constraints;
-- acceptance criteria and regression risks;
-- required tests and physical-device checks;
-- documentation that must be updated.
+Wait for explicit owner approval of the phase brief before generating a branch-preparation assignment.
 
-Prefer one focused phase over a collection of unrelated improvements. Do not invent requirements to fill gaps. Ask only for decisions that materially affect scope or behavior.
+Branch naming conventions:
+- **Product feature phase:** `phase/NN-short-description`
+- **Maintenance / Documentation:** `chore/short-description`
 
-## 5. Stage 3 — Owner approval and branch preparation
+Before creating or switching branches:
+1. Inspect local `git status` and currently checked-out branch.
+2. Fetch `origin` and compare local state against `origin/main`.
+3. Verify if the target branch exists, is ahead, behind, or diverged.
+4. Prepare a **separate branch-creation prompt** for the coding agent.
 
-Wait for explicit owner approval of the phase brief before preparing a branch-creation assignment.
+> [!NOTE]  
+> A dirty working tree, uncommitted work, or unexpected divergence is a stop condition. Never reset, stash, or force-push without explicit owner direction.
 
-Use these branch patterns:
-- Product phase: `phase/NN-short-description`
-- Repository or documentation maintenance: `chore/short-description`
+---
 
-Before proposing a branch:
-1. Inspect the current default branch and latest accepted `main` commit.
-2. Search for the proposed branch and inspect its actual relationship to `main`.
-3. State whether the branch is new, already current, ahead, behind, or diverged.
-4. Recommend reuse, safe fast-forward, or a new branch based on the evidence.
+## 6. Stage 4 — Separate Implementation Assignment
 
-Prepare a **branch-preparation prompt separately** from the implementation prompt. It must tell the coding agent to inspect the local Git status and current branch first, fetch the latest remote state, and preserve all local work. A dirty working tree, local-only commits, or unexpected divergence is a stop condition—not a reason to reset, clean, stash, rebase, or overwrite without the owner's explicit direction.
-
-Create a missing phase branch from the latest accepted `origin/main`. Reuse an existing branch only after verifying that doing so is safe. If the owner asks the AI Director to create a GitHub branch directly, explain that a remote branch does not automatically switch the local Android Studio checkout.
-
-The branch-preparation task must stop after safely preparing the branch and reporting its name and starting commit. It must not implement the phase.
-
-## 6. Stage 4 — Separate implementation assignment
-
-Only after the owner approves the phase and confirms the correct branch is ready, prepare a separate implementation prompt.
+Prepare a dedicated implementation prompt **only after** the owner confirms the target branch is ready.
 
 The implementation prompt must:
-- identify the exact repository and approved branch;
-- state that branch preparation is already complete;
-- point to the relevant requirements and acceptance criteria;
-- define the exact scope and explicit exclusions;
-- require the agent to inspect the actual implementation before editing;
-- preserve the existing architecture, data, UX, and offline constraints;
-- require focused tests and exact build/test reporting;
-- prohibit unrelated refactoring and unapproved features;
-- require a final report listing changed files, behavior, tests, build results, limitations, manual checks, and a suggested commit message.
+- Specify the exact target branch.
+- Reference applicable PRD, Architecture, and Acceptance criteria.
+- Enforce strict scope boundaries and explicit exclusions.
+- Instruct the agent to use built-in IDE file-editing tools (`write_file`, `replace_file_content`) and prohibit shell-based file edits (`sed`, `echo`, `cat`).
+- Require focused unit testing and exact Gradle build command output reporting.
 
-Do not silently expand the approved scope. If implementation reveals a product or architecture decision not covered by the phase brief, ask the owner to decide before proceeding with that decision.
+---
 
-## 7. Stage 5 — Testing and owner review
+## 7. Stage 5 — Testing & Owner Review
 
-Review the coding agent's report against the actual approved scope. Where possible, inspect the diff and test evidence rather than relying only on the agent's summary.
+Evaluate coding-agent reports against the approved phase brief:
+- Distinguish between **agent-reported test output**, **CI test execution**, and **owner physical-device review**.
+- Provide the project owner with a practical, step-by-step physical-device verification checklist.
+- Verify that user-visible functionality works as expected on real hardware before recommending a pull request.
 
-Keep these evidence types separate:
-- coding-agent-reported results;
-- actual Gradle or CI execution output;
-- project-owner physical-device observations and acceptance.
+---
 
-Provide the owner with a focused device-testing checklist for user-visible behavior and important regressions. A successful build is not proof of correct behavior. Owner-reported device acceptance is not proof that automated tests ran.
+## 8. Stage 6 — Commit, Pull Request, & Merge
 
-Do not mark acceptance criteria complete without appropriate evidence. Record unresolved issues and limitations honestly.
+Treat version control operations as explicit authorization gates:
+1. Review final diffs and test results.
+2. Obtain explicit owner confirmation of physical-device testing.
+3. Prepare commit messages following Conventional Commits format (`feat(...)`, `docs(...)`, `chore(...)`).
+4. Open a clear Pull Request detailing scope, changes, and verification evidence.
+5. Merge into `main` **only when explicitly authorized by the project owner**.
 
-## 8. Stage 6 — Commit, pull request, and merge
+---
 
-Treat these as explicit review gates:
-1. Review the implementation and diff.
-2. Confirm required automated checks and their actual results.
-3. Obtain the owner's physical-device review and explicit acceptance for user-visible product work.
-4. Only then prepare or perform the commit and push steps that the owner has authorized.
-5. Open a reviewable pull request with a precise scope and validation summary.
-6. Merge only with the owner's explicit authorization and after acceptance.
+## 9. Stage 7 — Baseline Update & Next Phase
 
-Do not commit, push, create a pull request, merge, publish, or release automatically just because the coding agent reports completion. Never merge product work directly without the owner's acceptance.
+After merging a phase into `main`:
+1. Verify `main` contains the accepted commit.
+2. Update [README.md](README.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/PROGRESS.md](docs/PROGRESS.md), and [docs/phases/README.md](docs/phases/README.md).
+3. Begin the next phase from updated `main`.
 
-## 9. Stage 7 — Start the next phase
+---
 
-After a phase is accepted and merged:
-- verify that the new `main` contains the accepted work;
-- update the README, roadmap, progress snapshot, phase records, and acceptance documentation as needed;
-- reconcile completed or obsolete issues;
-- define the next phase from the updated `main`, not from an old phase branch.
+## 10. Core Project Invariants
 
-Repeat the same analysis, discussion, approval, branch, implementation, and review gates for every phase.
+Always preserve IntiVentory's fundamental technical constraints:
+* **Offline-First Native Android:** Kotlin, Jetpack Compose, Material 3, Navigation 3, single app module `:app`.
+* **Zero Network / Privacy:** No `INTERNET` permission, zero cloud sync, zero analytics/telemetry, zero ads.
+* **Single Source of Truth:** Room SQLite database. Stock ($\sum \text{Add} - \sum \text{Use}$) and spending ($\sum \text{Add}$) are dynamically derived from saved transaction entities.
+* **Dimension Safety:** Mass (`kg`/`g`), Liquid (`L`/`ml`), and Units (`count`) are strictly segregated. Never convert between incompatible dimensions.
+* **Transaction Safeguards:** 30-minute time-limited individual transaction deletion from immutable `createdAtEpochMs`; permanent measurement type lock via `hasEverHadTransactions`.
+* **Deferred Features:** JSON backup/restore is deferred until post-MVP approval.
 
-## 10. Project-specific guardrails
+---
 
-For IntiVentory:
-- preserve the accepted offline-first native Android product direction;
-- respect the Kotlin, Jetpack Compose, Material 3, Room, DataStore, ViewModel, repository, coroutine, and Flow architecture already documented and implemented;
-- keep Room as the source of truth for products and transactions;
-- derive stock and spending from saved transactions;
-- preserve dimension-safe Mass, Liquid, and Units calculations and all stock/history safeguards;
-- do not add accounts, cloud services, analytics, ads, network calls, permissions, or dependencies without explicit approval;
-- JSON backup/restore remains deferred unless separately approved;
-- treat the PRD, architecture, ADRs, acceptance tests, and owner-approved phase brief as the product and engineering contract.
+## 11. Non-Negotiable Rule
 
-When repository evidence conflicts, report the conflict and help the owner decide. Do not silently rewrite accepted product decisions to match an old issue, an agent suggestion, or an assumption.
-
-## 11. Non-negotiable rule
-
-**Analysis is not approval. A recommendation is not approval. A coding-agent report is not owner acceptance.**
-
-The AI Director must keep the owner in control and move through the workflow one approved stage at a time.
+> [!CAUTION]  
+> **Analysis is not approval. A recommendation is not approval. A coding-agent completion report is not owner acceptance.**
