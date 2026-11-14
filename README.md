@@ -114,13 +114,13 @@ IntiVentory has completed core MVP development (**Phases 01–07**):
 
 | Phase | Description | Status | Evidence Baseline |
 | :---: | :--- | :---: | :--- |
-| **Phase 01** | Android Foundation & Architecture Setup | ✅ Complete | PR #2 — Package structure, Compose, Room, DataStore |
-| **Phase 02** | Welcome & Home Screen | ✅ Complete | PR #3 — Onboarding, greeting, category hero cards |
-| **Phase 03** | Product Catalogue & Management | ✅ Complete | PR #5 — 15 starter products, custom items, archive/restore |
-| **Phase 04** | Add/Use Transactions & Stock Rules | ✅ Complete | PR #6 — Dimension conversions, atomic stock validation |
-| **Phase 05** | Product Transaction History & Safeguards | ✅ Complete | PR #7 — Date-grouped audit, 30-min delete cutoff, edit flows |
-| **Phase 06** | Spending Dashboard & Insights | ✅ Complete | PR #8 — 5 period filters, trend chart, top products, category shares |
-| **Phase 07** | Verification & Intended-User Acceptance | ✅ Complete | Main baseline — Owner physical-device acceptance confirmed (2026-11-02) |
+| **Phase 01** | Android Foundation & Architecture Setup | ✅ Complete | [PR #2](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/2) — Package structure, Compose, Room, DataStore |
+| **Phase 02** | Welcome & Home Screen | ✅ Complete | [PR #3](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/3) — Onboarding, greeting, category hero cards |
+| **Phase 03** | Product Catalogue & Management | ✅ Complete | [PR #5](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/5) — 15 starter products, custom items, archive/restore |
+| **Phase 04** | Add/Use Transactions & Stock Rules | ✅ Complete | [PR #6](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/6) — Dimension conversions, atomic stock validation |
+| **Phase 05** | Product Transaction History & Safeguards | ✅ Complete | [PR #7](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/7) — Date-grouped audit, 30-min delete cutoff, edit flows |
+| **Phase 06** | Spending Dashboard & Insights | ✅ Complete | [PR #8](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/pull/8) — 5 period filters, trend chart, top products, category shares |
+| **Phase 07** | Verification & Intended-User Acceptance | ✅ Complete | [Main Baseline](https://github.com/BoyidapuMaheshBabu/IntiVentory-Android/tree/main) — Owner physical-device acceptance confirmed (2026-11-02) |
 
 > [!NOTE]  
 > **Deferred Features:** JSON backup/restore is deferred beyond the accepted core MVP and is not currently implemented.
@@ -166,6 +166,8 @@ graph TD
 3. **Currency Integrity:** Money is parsed using `MoneyUtils` and stored internally as integer paise (`Long`) to prevent floating-point rounding errors.
 4. **Time-Limited Safeguards:** Individual transaction deletion is restricted to $\le 30$ minutes after initial recording (`createdAtEpochMs`), enforced at both repository/DAO and ViewModel layers.
 
+Detailed technical design and database schema specifications are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ---
 
 ## Technology Stack
@@ -189,6 +191,12 @@ graph TD
 
 ```text
 IntiVentory-Android/
+├── build.gradle                    # Root Gradle build script
+├── settings.gradle                 # Gradle project settings
+├── gradlew                         # Gradle wrapper executable (Unix)
+├── gradlew.bat                     # Gradle wrapper batch script (Windows)
+├── gradle/
+│   └── libs.versions.toml          # Central Gradle Version Catalog
 ├── app/
 │   ├── build.gradle                # App module Groovy Gradle build script
 │   └── src/main/java/com/boyidapu/homestock/
@@ -255,7 +263,11 @@ IntiVentory-Android/
 ### Command Line Gradle Operations
 
 #### Run Unit Tests
-* **Windows (Command Prompt / PowerShell):**
+* **Windows PowerShell:**
+  ```powershell
+  .\gradlew.bat test
+  ```
+* **Windows Command Prompt (CMD):**
   ```cmd
   gradlew.bat test
   ```
@@ -265,7 +277,11 @@ IntiVentory-Android/
   ```
 
 #### Build Debug APK
-* **Windows:**
+* **Windows PowerShell:**
+  ```powershell
+  .\gradlew.bat assembleDebug
+  ```
+* **Windows Command Prompt (CMD):**
   ```cmd
   gradlew.bat assembleDebug
   ```
