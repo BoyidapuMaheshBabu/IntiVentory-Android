@@ -334,6 +334,15 @@ Repository Analysis ➔ Discussion ➔ Phase Definition ➔ Owner Approval ➔ B
 
 ---
 
+## 👨‍💻 Developer
+
+**Boyidapu Mahesh Babu**  
+Diploma in Computer Science Engineering student
+
+[GitHub Profile](https://github.com/BoyidapuMaheshBabu)
+
+---
+
 <p align="center">
   Developed with ❤️ for household peace of mind. Local-first, private, and reliable.
 </p>
