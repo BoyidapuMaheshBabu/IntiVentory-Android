@@ -21,16 +21,17 @@ IntiVentory is an **offline-first native Android household inventory and spendin
 
 ## Documentation
 
+- [AI Director instructions](AI-DIRECTOR.md) — how a planning/conversational AI must analyse the repository, discuss and define a phase, obtain owner approval, prepare separate branch and implementation assignments, and coordinate review.
+- [Agent instructions](AGENTS.md) — mandatory rules for Friday and other coding agents, including stage authorization, safe Git operations, implementation constraints, validation, and reporting.
 - [Product requirements document](docs/PRD.md) — product behavior, user flows, and business rules.
 - [Architecture](docs/ARCHITECTURE.md) — technical decisions, data model, state flow, calculations, and test layers.
 - [Acceptance tests](docs/ACCEPTANCE-TESTS.md) — expected outcomes and traceability scenarios.
 - [Roadmap](docs/ROADMAP.md) — phase scope, delivery history, and acceptance gates.
 - [Progress summary](docs/PROGRESS.md) — current baseline, completion status, and verification limits.
 - [Branding](docs/BRANDING.md) — approved name, Telugu caption, SVG references, and color palette.
-- [Development workflow](docs/DEVELOPMENT-WORKFLOW.md) — planning, evidence, branching, and review process.
+- [Development workflow](docs/DEVELOPMENT-WORKFLOW.md) — the required analysis-to-merge lifecycle shared by the owner, AI Director, and coding agents.
 - [Phase records](docs/phases/README.md) — phase verification documents and the Phase 06 design reference.
 - [Architecture decision records](docs/adr/README.md) — concise history of significant technical decisions.
-- [Agent instructions](AGENTS.md) — repository-specific guidance for AI coding agents.
 
 ## Key rules
 
