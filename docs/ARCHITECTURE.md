@@ -125,7 +125,7 @@ Room SQLite database is the **Single Source of Truth** for inventory and financi
 
 #### `TransactionEntity` (`inventory_transactions` table)
 * `id` (Long, Primary Key, AutoGenerate)
-* `productId` (Long, Foreign Key -> `products.id` ON DELETE CASCADE)
+* `productId` (Long, Foreign Key -> `products.id` ON DELETE RESTRICT)
 * `type` (String: `ADD`, `USE`)
 * `quantityBaseUnit` (Long, base unit: `g`, `ml`, or `count`)
 * `entryUnit` (String: `kg`, `g`, `L`, `ml`, `count`)
@@ -179,6 +179,11 @@ $$\text{CurrentTime} - \text{createdAtEpochMs} < 30 \text{ minutes } (1,800,000 
 ### 6.2 Permanent Dimension Lock
 * Measurement dimension can be modified while a product has zero transaction history.
 * Once any transaction is saved, `hasEverHadTransactions` is set to `true` and remains `true` permanently, preventing dimension changes even if all transactions are subsequently deleted or current stock returns to zero.
+
+### 6.3 Atomic Product Deletion & Foreign Key Safety
+* Transaction entities reference their parent product with an `ON DELETE RESTRICT` foreign key constraint (`ForeignKey.RESTRICT`).
+* Permanent product deletion is executed atomically via `ProductRepositoryImpl.deleteProductAtomically(productId)` inside a Room database transaction (`database.withTransaction`).
+* Child transaction rows are deleted explicitly first (`productDao.deleteTransactionsForProduct(productId)`), followed by the product row (`productDao.deleteProductById(productId)`). This explicit child-first sequence inside a single database transaction guarantees data integrity while avoiding unmanaged background SQLite foreign key cascades.
 
 ---
 
