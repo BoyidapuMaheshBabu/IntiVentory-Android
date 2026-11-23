@@ -255,4 +255,26 @@ class EditProductViewModelTest {
         val illegalUpdate = lockedProduct.copy(dimension = MeasurementDimension.VOLUME)
         fakeProductRepository.updateProduct(illegalUpdate)
     }
+
+    @Test
+    fun editProduct_duplicateName_showsErrorMessage(): Unit = runTest {
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val otherProduct = Product(
+            id = 600L,
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Dal",
+            dimension = MeasurementDimension.MASS
+        )
+        fakeProductRepository.addTestProduct(otherProduct)
+
+        // Edit testProduct ("Basmati Rice") to " Dal "
+        viewModel.onNameInputChanged(" Dal ")
+        assertTrue(viewModel.uiState.value.canSave)
+
+        viewModel.saveProduct()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("A product with this name already exists", viewModel.uiState.value.errorMessage)
+    }
 }

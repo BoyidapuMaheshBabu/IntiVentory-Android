@@ -93,7 +93,7 @@ class EditProductViewModel(
 
     fun onDimensionSelected(dimension: MeasurementDimension) {
         val currentProduct = _uiState.value.product
-        if (currentProduct != null && currentProduct.hasEverHadTransactions) {
+        if ((currentProduct != null) && currentProduct.hasEverHadTransactions) {
             return
         }
         if (!_uiState.value.hasTransactions) {
@@ -134,6 +134,17 @@ class EditProductViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, canSave = false) }
             try {
+                if (productRepository.doesProductExistWithName(trimmedName, excludeProductId = currentProduct.id)) {
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            canSave = true,
+                            errorMessage = "A product with this name already exists"
+                        )
+                    }
+                    return@launch
+                }
+
                 val newDimension = currentState.selectedDimension
                 val updatedPreferredUnit = if (newDimension != currentProduct.dimension) {
                     newDimension.defaultUnit
@@ -159,7 +170,7 @@ class EditProductViewModel(
                     )
                 }
                 _eventFlow.emit(EditProductEvent.SaveSuccess)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.update {
                     it.copy(
                         isSaving = false,

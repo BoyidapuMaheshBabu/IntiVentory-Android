@@ -78,4 +78,21 @@ class CreateProductViewModelTest {
 
         assertTrue(viewModel.uiState.value.isSaveSuccess)
     }
+
+    @Test
+    fun saveProduct_duplicateName_showsErrorMessage(): Unit = runTest {
+        val existingProduct = com.boyidapu.homestock.domain.model.Product(
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Rice",
+            dimension = MeasurementDimension.MASS
+        )
+        fakeProductRepository.addTestProduct(existingProduct)
+
+        viewModel.onNameInputChanged("rice") // Case-insensitive duplicate
+        viewModel.saveProduct()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSaveSuccess)
+        assertEquals("A product with this name already exists", viewModel.uiState.value.errorMessage)
+    }
 }

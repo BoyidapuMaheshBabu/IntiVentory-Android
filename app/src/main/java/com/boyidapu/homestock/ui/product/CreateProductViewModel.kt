@@ -89,6 +89,16 @@ class CreateProductViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             try {
+                if (productRepository.doesProductExistWithName(trimmedName)) {
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            errorMessage = "A product with this name already exists"
+                        )
+                    }
+                    return@launch
+                }
+
                 val newProduct = Product(
                     category = category,
                     name = trimmedName.take(MAX_PRODUCT_NAME_LENGTH),

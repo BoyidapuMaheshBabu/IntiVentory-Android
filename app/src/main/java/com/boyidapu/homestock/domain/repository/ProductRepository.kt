@@ -17,5 +17,6 @@ interface ProductRepository {
     suspend fun restoreProduct(productId: Long)
     suspend fun deleteProductAtomically(productId: Long): Boolean
     suspend fun getTransactionCountForProduct(productId: Long): Int
+    suspend fun doesProductExistWithName(name: String, excludeProductId: Long? = null): Boolean
     suspend fun ensureCatalogSeeded()
 }

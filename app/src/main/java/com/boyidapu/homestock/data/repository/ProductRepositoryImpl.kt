@@ -48,7 +48,12 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun insertProduct(product: Product): Long {
-        return productDao.insertProduct(ProductEntity.fromDomain(product))
+        return database.withTransaction {
+            if (productDao.doesProductExistWithName(product.name.trim())) {
+                throw IllegalArgumentException("A product with name '${product.name.trim()}' already exists")
+            }
+            productDao.insertProduct(ProductEntity.fromDomain(product))
+        }
     }
 
     override suspend fun updateProduct(product: Product) {
@@ -57,6 +62,9 @@ class ProductRepositoryImpl(
             if (existing != null) {
                 if (existing.hasEverHadTransactions && (existing.dimension != product.dimension.name)) {
                     throw IllegalArgumentException("Cannot change measurement dimension of a product that has transaction history")
+                }
+                if (productDao.doesProductExistWithName(product.name.trim(), excludeProductId = product.id)) {
+                    throw IllegalArgumentException("A product with name '${product.name.trim()}' already exists")
                 }
                 val updatedHasEverHad = existing.hasEverHadTransactions || product.hasEverHadTransactions
                 val updatedProduct = product.copy(hasEverHadTransactions = updatedHasEverHad)
@@ -86,6 +94,10 @@ class ProductRepositoryImpl(
 
     override suspend fun getTransactionCountForProduct(productId: Long): Int {
         return productDao.getTransactionCountForProduct(productId)
+    }
+
+    override suspend fun doesProductExistWithName(name: String, excludeProductId: Long?): Boolean {
+        return productDao.doesProductExistWithName(name.trim(), excludeProductId)
     }
 
     override suspend fun ensureCatalogSeeded() {

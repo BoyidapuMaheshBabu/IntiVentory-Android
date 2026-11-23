@@ -33,6 +33,15 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :productId LIMIT 1")
     suspend fun getProductByIdSync(productId: Long): ProductEntity?
 
+    @Query("""
+        SELECT EXISTS(
+            SELECT 1 FROM products
+            WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name))
+            AND (:excludeProductId IS NULL OR id != :excludeProductId)
+        )
+    """)
+    suspend fun doesProductExistWithName(name: String, excludeProductId: Long? = null): Boolean
+
     @Query("SELECT * FROM products WHERE isArchived = 1 ORDER BY name ASC")
     fun getArchivedProducts(): Flow<List<ProductEntity>>
 

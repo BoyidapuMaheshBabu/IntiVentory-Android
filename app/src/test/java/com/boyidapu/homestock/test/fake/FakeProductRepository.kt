@@ -52,6 +52,10 @@ class FakeProductRepository : ProductRepository {
     }
 
     override suspend fun insertProduct(product: Product): Long {
+        val trimmed = product.name.trim()
+        if (doesProductExistWithName(trimmed)) {
+            throw IllegalArgumentException("A product with name '$trimmed' already exists")
+        }
         val newId = if (product.id == 0L) (products.value.maxOfOrNull { it.id } ?: 0L) + 1L else product.id
         val newProduct = product.copy(id = newId)
         products.value = products.value + newProduct
@@ -63,6 +67,9 @@ class FakeProductRepository : ProductRepository {
         if (existing != null) {
             if (existing.hasEverHadTransactions && existing.dimension != product.dimension) {
                 throw IllegalArgumentException("Cannot change measurement dimension of a product that has transaction history")
+            }
+            if (doesProductExistWithName(product.name.trim(), excludeProductId = product.id)) {
+                throw IllegalArgumentException("A product with name '${product.name.trim()}' already exists")
             }
             val updatedHasEverHad = existing.hasEverHadTransactions || product.hasEverHadTransactions
             val updated = product.copy(hasEverHadTransactions = updatedHasEverHad)
@@ -88,6 +95,14 @@ class FakeProductRepository : ProductRepository {
 
     override suspend fun getTransactionCountForProduct(productId: Long): Int {
         return transactions.value[productId] ?: 0
+    }
+
+    override suspend fun doesProductExistWithName(name: String, excludeProductId: Long?): Boolean {
+        val trimmed = name.trim()
+        return products.value.any {
+            (excludeProductId == null || it.id != excludeProductId) &&
+                it.name.trim().equals(trimmed, ignoreCase = true)
+        }
     }
 
     override suspend fun ensureCatalogSeeded() {
