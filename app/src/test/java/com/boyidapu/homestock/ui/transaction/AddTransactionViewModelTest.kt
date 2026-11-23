@@ -135,4 +135,25 @@ class AddTransactionViewModelTest {
         assertFalse(viewModel.uiState.value.canSave)
         assertEquals("Future dates are not allowed", viewModel.uiState.value.dateError)
     }
+
+    @Test
+    fun preferredUnit_honoredOnFormInitialization(): Unit = runTest {
+        val spices = Product(
+            id = 105L,
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Spices",
+            dimension = MeasurementDimension.MASS,
+            preferredUnit = UnitType.G
+        )
+        fakeProductRepository.addTestProduct(spices)
+
+        val spicesVm = AddTransactionViewModel(
+            productId = spices.id,
+            productRepository = fakeProductRepository,
+            transactionRepository = fakeTransactionRepository
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(UnitType.G, spicesVm.uiState.value.selectedUnit)
+    }
 }

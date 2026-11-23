@@ -84,7 +84,7 @@ class CreateProductViewModel(
             return
         }
 
-        val category = FixedCategory.fromId(categoryId) ?: FixedCategory.FOOD_KITCHEN
+        val category = FixedCategory.fromId(categoryId)
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
@@ -93,6 +93,7 @@ class CreateProductViewModel(
                     category = category,
                     name = trimmedName.take(MAX_PRODUCT_NAME_LENGTH),
                     dimension = _uiState.value.selectedDimension,
+                    preferredUnit = _uiState.value.selectedUnit,
                     isPreset = false,
                     isArchived = false,
                     createdAtEpochMs = System.currentTimeMillis()
@@ -101,7 +102,7 @@ class CreateProductViewModel(
                 _uiState.update {
                     it.copy(isSaving = false, isSaveSuccess = true)
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _uiState.update {
                     it.copy(
                         isSaving = false,

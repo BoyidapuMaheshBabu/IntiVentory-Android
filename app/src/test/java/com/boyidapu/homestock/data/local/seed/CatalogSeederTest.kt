@@ -50,4 +50,46 @@ class CatalogSeederTest {
         assertEquals(MeasurementDimension.VOLUME.name, shampoo.dimension)
         assertEquals(UnitType.ML.symbol, shampoo.preferredUnit)
     }
+
+    @Test
+    fun toDomain_preservesPersistedPreferredUnit() {
+        val spicesEntity = CatalogSeeder.STARTER_PRODUCTS.first { it.name == "Spices" }
+        val spicesDomain = spicesEntity.toDomain()
+        assertEquals(UnitType.G, spicesDomain.preferredUnit)
+
+        val shampooEntity = CatalogSeeder.STARTER_PRODUCTS.first { it.name == "Shampoo" }
+        val shampooDomain = shampooEntity.toDomain()
+        assertEquals(UnitType.ML, shampooDomain.preferredUnit)
+
+        val hairOilEntity = CatalogSeeder.STARTER_PRODUCTS.first { it.name == "Hair Oil" }
+        val hairOilDomain = hairOilEntity.toDomain()
+        assertEquals(UnitType.ML, hairOilDomain.preferredUnit)
+    }
+
+    @Test
+    fun roundTrip_domainAndEntityPreservePreferredUnit() {
+        CatalogSeeder.STARTER_PRODUCTS.forEach { entity ->
+            val domain = entity.toDomain()
+            val convertedBack = com.boyidapu.homestock.data.local.entity.ProductEntity.fromDomain(domain)
+            assertEquals(entity.preferredUnit, convertedBack.preferredUnit)
+            assertEquals(domain.preferredUnit, convertedBack.toDomain().preferredUnit)
+        }
+    }
+
+    @Test
+    fun toDomain_incompatibleUnitFallsBackToDimensionDefault() {
+        val invalidEntity = com.boyidapu.homestock.data.local.entity.ProductEntity(
+            id = 999L,
+            categoryId = FixedCategory.FOOD_KITCHEN.id,
+            name = "Broken Product",
+            dimension = MeasurementDimension.MASS.name,
+            preferredUnit = UnitType.L.symbol, // Invalid: Liquid unit for Mass dimension
+            isPreset = false,
+            isArchived = false,
+            createdAtEpochMs = 1000L
+        )
+
+        val domain = invalidEntity.toDomain()
+        assertEquals(UnitType.KG, domain.preferredUnit) // Falls back to Mass default (KG)
+    }
 }
