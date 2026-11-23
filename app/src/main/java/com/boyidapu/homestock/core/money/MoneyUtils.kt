@@ -35,4 +35,11 @@ object MoneyUtils {
             maximumFractionDigits = 2
         }.format(rupees)
     }
+
+    fun calculateAverageSpendingPaise(totalSpendingPaise: Long, purchaseCount: Int): Long? {
+        if (purchaseCount <= 0) return null
+        return BigDecimal(totalSpendingPaise)
+            .divide(BigDecimal(purchaseCount), 0, RoundingMode.HALF_UP)
+            .longValueExact()
+    }
 }
