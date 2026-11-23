@@ -52,7 +52,7 @@ class EditProductViewModel(
         viewModelScope.launch {
             val product = productRepository.getProductById(productId).firstOrNull()
             if (product != null) {
-                val count = productRepository.getTransactionCountForProduct(productId)
+                val isDimensionLocked = product.hasEverHadTransactions
                 _uiState.update {
                     it.copy(
                         product = product,
@@ -60,7 +60,7 @@ class EditProductViewModel(
                         originalDimension = product.dimension,
                         nameInput = product.name,
                         selectedDimension = product.dimension,
-                        hasTransactions = count > 0,
+                        hasTransactions = isDimensionLocked,
                         isChanged = false,
                         canSave = false,
                         errorMessage = null,
@@ -81,7 +81,7 @@ class EditProductViewModel(
             val isNameChanged = truncated.trim() != state.originalName.trim()
             val isDimensionChanged = state.selectedDimension != state.originalDimension
             val isChanged = isNameChanged || isDimensionChanged
-            val isValid = truncated.trim().isNotEmpty() && truncated.trim().length <= CreateProductViewModel.MAX_PRODUCT_NAME_LENGTH
+            val isValid = truncated.trim().isNotEmpty() && (truncated.trim().length <= CreateProductViewModel.MAX_PRODUCT_NAME_LENGTH)
             state.copy(
                 nameInput = truncated,
                 isChanged = isChanged,
@@ -92,6 +92,10 @@ class EditProductViewModel(
     }
 
     fun onDimensionSelected(dimension: MeasurementDimension) {
+        val currentProduct = _uiState.value.product
+        if (currentProduct != null && currentProduct.hasEverHadTransactions) {
+            return
+        }
         if (!_uiState.value.hasTransactions) {
             _uiState.update { state ->
                 val isNameChanged = state.nameInput.trim() != state.originalName.trim()
@@ -112,6 +116,13 @@ class EditProductViewModel(
         val currentState = _uiState.value
         if (!currentState.canSave) return
 
+        if (currentProduct.hasEverHadTransactions && currentState.selectedDimension != currentProduct.dimension) {
+            _uiState.update {
+                it.copy(errorMessage = "Cannot change dimension after product has transaction history", canSave = false)
+            }
+            return
+        }
+
         val trimmedName = currentState.nameInput.trim()
         if (trimmedName.isEmpty()) {
             _uiState.update {
@@ -124,9 +135,15 @@ class EditProductViewModel(
             _uiState.update { it.copy(isSaving = true, canSave = false) }
             try {
                 val newDimension = currentState.selectedDimension
+                val updatedPreferredUnit = if (newDimension != currentProduct.dimension) {
+                    newDimension.defaultUnit
+                } else {
+                    currentProduct.preferredUnit
+                }
                 val updatedProduct = currentProduct.copy(
                     name = trimmedName.take(CreateProductViewModel.MAX_PRODUCT_NAME_LENGTH),
-                    dimension = newDimension
+                    dimension = newDimension,
+                    preferredUnit = updatedPreferredUnit
                 )
                 productRepository.updateProduct(updatedProduct)
                 _uiState.update {

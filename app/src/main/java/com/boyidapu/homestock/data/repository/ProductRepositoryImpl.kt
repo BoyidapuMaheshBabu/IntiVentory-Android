@@ -52,7 +52,19 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun updateProduct(product: Product) {
-        productDao.updateProduct(ProductEntity.fromDomain(product))
+        database.withTransaction {
+            val existing = productDao.getProductByIdSync(product.id)
+            if (existing != null) {
+                if (existing.hasEverHadTransactions && (existing.dimension != product.dimension.name)) {
+                    throw IllegalArgumentException("Cannot change measurement dimension of a product that has transaction history")
+                }
+                val updatedHasEverHad = existing.hasEverHadTransactions || product.hasEverHadTransactions
+                val updatedProduct = product.copy(hasEverHadTransactions = updatedHasEverHad)
+                productDao.updateProduct(ProductEntity.fromDomain(updatedProduct))
+            } else {
+                productDao.updateProduct(ProductEntity.fromDomain(product))
+            }
+        }
     }
 
     override suspend fun archiveProduct(productId: Long): Boolean {

@@ -165,6 +165,7 @@ class EditProductViewModelTest {
             category = FixedCategory.FOOD_KITCHEN,
             name = "Oil",
             dimension = MeasurementDimension.VOLUME,
+            hasEverHadTransactions = true,
             isPreset = false,
             isArchived = false
         )
@@ -179,5 +180,79 @@ class EditProductViewModelTest {
         historyViewModel.onDimensionSelected(MeasurementDimension.MASS)
         assertEquals(MeasurementDimension.VOLUME, historyViewModel.uiState.value.selectedDimension)
         assertFalse(historyViewModel.uiState.value.canSave)
+    }
+
+    @Test
+    fun typeLocking_whenHasEverHadTransactionsIsTrue_dimensionChangeBlockedEvenIfCountIsZero(): Unit = runTest {
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Product had transactions historically, but count is now 0 (e.g. transactions deleted)
+        val lockedProduct = Product(
+            id = 300L,
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Spices",
+            dimension = MeasurementDimension.MASS,
+            hasEverHadTransactions = true,
+            isPreset = false,
+            isArchived = false
+        )
+        fakeProductRepository.addTestProduct(lockedProduct, transactionCount = 0)
+
+        val lockedViewModel = EditProductViewModel(300L, fakeProductRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(lockedViewModel.uiState.value.hasTransactions)
+
+        // Attempting to change dimension is blocked
+        lockedViewModel.onDimensionSelected(MeasurementDimension.VOLUME)
+        assertEquals(MeasurementDimension.MASS, lockedViewModel.uiState.value.selectedDimension)
+        assertFalse(lockedViewModel.uiState.value.canSave)
+    }
+
+    @Test
+    fun productNameEditing_allowedWhenDimensionIsLocked(): Unit = runTest {
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val lockedProduct = Product(
+            id = 400L,
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Old Name",
+            dimension = MeasurementDimension.MASS,
+            hasEverHadTransactions = true,
+            isPreset = false,
+            isArchived = false
+        )
+        fakeProductRepository.addTestProduct(lockedProduct, transactionCount = 0)
+
+        val lockedViewModel = EditProductViewModel(400L, fakeProductRepository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        lockedViewModel.onNameInputChanged("New Name")
+        assertTrue(lockedViewModel.uiState.value.canSave)
+
+        lockedViewModel.saveProduct()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Verify name changed but dimension remained MASS
+        assertEquals("New Name", lockedViewModel.uiState.value.nameInput)
+        assertEquals(MeasurementDimension.MASS, lockedViewModel.uiState.value.selectedDimension)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun repository_directUpdateRejectsDimensionChangeWhenHasEverHadTransactions(): Unit = runTest {
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val lockedProduct = Product(
+            id = 500L,
+            category = FixedCategory.FOOD_KITCHEN,
+            name = "Flour",
+            dimension = MeasurementDimension.MASS,
+            hasEverHadTransactions = true
+        )
+        fakeProductRepository.addTestProduct(lockedProduct, transactionCount = 0)
+
+        // Direct repository update attempting dimension change
+        val illegalUpdate = lockedProduct.copy(dimension = MeasurementDimension.VOLUME)
+        fakeProductRepository.updateProduct(illegalUpdate)
     }
 }

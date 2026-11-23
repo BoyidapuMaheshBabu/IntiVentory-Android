@@ -59,7 +59,17 @@ class FakeProductRepository : ProductRepository {
     }
 
     override suspend fun updateProduct(product: Product) {
-        products.value = products.value.map { if (it.id == product.id) product else it }
+        val existing = products.value.firstOrNull { it.id == product.id }
+        if (existing != null) {
+            if (existing.hasEverHadTransactions && existing.dimension != product.dimension) {
+                throw IllegalArgumentException("Cannot change measurement dimension of a product that has transaction history")
+            }
+            val updatedHasEverHad = existing.hasEverHadTransactions || product.hasEverHadTransactions
+            val updated = product.copy(hasEverHadTransactions = updatedHasEverHad)
+            products.value = products.value.map { if (it.id == product.id) updated else it }
+        } else {
+            products.value = products.value.map { if (it.id == product.id) product else it }
+        }
     }
 
     override suspend fun archiveProduct(productId: Long): Boolean {

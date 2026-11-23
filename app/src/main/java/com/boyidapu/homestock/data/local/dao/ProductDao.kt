@@ -30,6 +30,9 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id = :productId LIMIT 1")
     fun getProductById(productId: Long): Flow<ProductEntity?>
 
+    @Query("SELECT * FROM products WHERE id = :productId LIMIT 1")
+    suspend fun getProductByIdSync(productId: Long): ProductEntity?
+
     @Query("SELECT * FROM products WHERE isArchived = 1 ORDER BY name ASC")
     fun getArchivedProducts(): Flow<List<ProductEntity>>
 
