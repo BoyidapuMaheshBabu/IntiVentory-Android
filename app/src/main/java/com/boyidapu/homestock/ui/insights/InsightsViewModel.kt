@@ -80,7 +80,7 @@ class InsightsViewModel(
                 else transactionRepository.getTopProductSpendingBetweenEpochDays(startEpoch, endEpoch)
 
             combine(spendingFlow, countFlow, txsFlow, catFlow, topProdFlow) { totalPaise, count, txs, categories, topProducts ->
-                val avgPaise = if (count > 0) totalPaise / count else null
+                val avgPaise = MoneyUtils.calculateAverageSpendingPaise(totalPaise, count)
                 val formattedAvg = if (avgPaise != null) MoneyUtils.formatPaiseToFormattedAmount(avgPaise) else "—"
 
                 val startDate = LocalDate.ofEpochDay(startEpoch)

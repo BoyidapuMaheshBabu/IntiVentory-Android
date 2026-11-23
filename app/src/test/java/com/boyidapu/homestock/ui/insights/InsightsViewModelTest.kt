@@ -17,7 +17,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
@@ -183,5 +182,55 @@ class InsightsViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(50000L, state.totalSpendingPaise) // Spending remains ₹500
+    }
+
+    @Test
+    fun averagePerPurchase_roundsToNearestPaiseHalfUp(): Unit = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        val today = LocalDate.now(ZoneId.systemDefault())
+
+        // 3 purchases total 101 paise (1 paise, 0 paise, 100 paise)
+        fakeTransactionRepository.addTransaction(
+            InventoryTransaction(
+                productId = 1L,
+                type = TransactionType.ADD,
+                baseQuantity = 1000L,
+                entryUnit = UnitType.G,
+                amountPaidPaise = 34L,
+                transactionEpochDay = today.toEpochDay()
+            )
+        )
+        fakeTransactionRepository.addTransaction(
+            InventoryTransaction(
+                productId = 1L,
+                type = TransactionType.ADD,
+                baseQuantity = 1000L,
+                entryUnit = UnitType.G,
+                amountPaidPaise = 34L,
+                transactionEpochDay = today.toEpochDay()
+            )
+        )
+        fakeTransactionRepository.addTransaction(
+            InventoryTransaction(
+                productId = 1L,
+                type = TransactionType.ADD,
+                baseQuantity = 1000L,
+                entryUnit = UnitType.G,
+                amountPaidPaise = 33L,
+                transactionEpochDay = today.toEpochDay()
+            )
+        )
+
+        viewModel.selectPeriod(SpendingPeriod.THIS_MONTH)
+
+        val state = viewModel.uiState.value
+        assertEquals(101L, state.totalSpendingPaise)
+        assertEquals(3, state.purchaseCount)
+        // 101 / 3 = 33.666... -> 34 paise
+        assertEquals(34L, state.averagePerPurchasePaise)
+        assertEquals("₹0.34", state.formattedAveragePerPurchase)
     }
 }
